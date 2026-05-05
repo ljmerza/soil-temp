@@ -5,8 +5,8 @@
   "config_flow": true,
   "codeowners": ["@ljmerza"],
   "dependencies": [],
-  "documentation": "https://github.com/ljmerza/soli-temp",
-  "issue_tracker": "https://github.com/ljmerza/soli-temp/issues",
+  "documentation": "https://github.com/ljmerza/soil-temp",
+  "issue_tracker": "https://github.com/ljmerza/soil-temp/issues",
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "requirements": []
