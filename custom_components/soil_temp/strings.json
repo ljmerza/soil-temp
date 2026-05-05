@@ -1,0 +1,42 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Soil Temp (ClearAPI)",
+        "description": "Sensors will be created for this Home Assistant instance's home coordinates: ({latitude}, {longitude}). Press Submit to confirm."
+      }
+    },
+    "abort": {
+      "already_configured": "Soil Temp is already configured for these coordinates.",
+      "coordinates_not_set": "Set Home Assistant's home coordinates first (Settings → System → General)."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Soil Temp options",
+        "data": {
+          "scan_interval": "Poll interval (hours)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "soil_temp_0to10cm": { "name": "Soil temperature (0–10cm)" },
+      "soil_temp_max_0to10cm": { "name": "Soil temperature max (0–10cm)" },
+      "soil_temp_min_0to10cm": { "name": "Soil temperature min (0–10cm)" },
+      "normalized_soil_temp_0to10cm": { "name": "Soil temperature anomaly (0–10cm)" },
+      "soil_moisture_0to10cm": { "name": "Soil moisture (0–10cm)" },
+      "scaled_soil_moisture_0to10cm": { "name": "Soil moisture scaled (0–10cm)" },
+      "abs_scaled_soil_moisture_0to10cm": { "name": "Soil moisture abs-scaled (0–10cm)" },
+      "abs_scaled_paw_soil_moisture_0to10cm": { "name": "Plant-available water scaled (0–10cm)" },
+      "normalized_soil_moisture_0to10cm": { "name": "Soil moisture anomaly (0–10cm)" },
+      "soil_moisture_0to200cm": { "name": "Soil moisture (0–200cm)" },
+      "scaled_soil_moisture_0to200cm": { "name": "Soil moisture scaled (0–200cm)" },
+      "abs_scaled_soil_moisture_0to200cm": { "name": "Soil moisture abs-scaled (0–200cm)" },
+      "abs_scaled_paw_soil_moisture_0to200cm": { "name": "Plant-available water scaled (0–200cm)" },
+      "normalized_soil_moisture_0to200cm": { "name": "Soil moisture anomaly (0–200cm)" }
+    }
+  }
+}

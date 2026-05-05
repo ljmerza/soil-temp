@@ -1,0 +1,13 @@
+{
+  "domain": "soil_temp",
+  "name": "Soil Temp (ClearAPI)",
+  "version": "0.1.0",
+  "config_flow": true,
+  "codeowners": ["@ljmerza"],
+  "dependencies": [],
+  "documentation": "https://github.com/ljmerza/soli-temp",
+  "issue_tracker": "https://github.com/ljmerza/soli-temp/issues",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "requirements": []
+}
