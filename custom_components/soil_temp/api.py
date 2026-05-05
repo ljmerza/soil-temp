@@ -67,6 +67,8 @@ class ClearApiClient:
                 if resp.status == 429:
                     raise ClearApiRateLimitError("ClearAPI rate limit exceeded")
                 resp.raise_for_status()
-                return await resp.json()
+                # ClearAPI returns valid JSON but advertises Content-Type: text/html.
+                # Disable aiohttp's content-type check so the body still decodes.
+                return await resp.json(content_type=None)
         except aiohttp.ClientError as err:
             raise ClearApiConnectionError(str(err)) from err
