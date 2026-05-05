@@ -3,14 +3,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, SENSOR_DESCRIPTIONS
+from .const import BUCKET_LATEST, DOMAIN, SENSOR_DESCRIPTIONS, SoilSensorDescription
 from .coordinator import SoilTempCoordinator
 
 
@@ -31,11 +31,13 @@ class SoilTempSensor(CoordinatorEntity[SoilTempCoordinator], SensorEntity):
 
     _attr_has_entity_name = True
 
+    entity_description: SoilSensorDescription
+
     def __init__(
         self,
         coordinator: SoilTempCoordinator,
         entry: ConfigEntry,
-        description: SensorEntityDescription,
+        description: SoilSensorDescription,
     ) -> None:
         super().__init__(coordinator)
         self.entity_description = description
@@ -53,7 +55,11 @@ class SoilTempSensor(CoordinatorEntity[SoilTempCoordinator], SensorEntity):
         snapshot = self.coordinator.data
         if snapshot is None:
             return None
-        return snapshot.values.get(self.entity_description.key)
+        bucket = getattr(snapshot, self.entity_description.bucket, None)
+        if not isinstance(bucket, dict):
+            return None
+        source = self.entity_description.source_field or self.entity_description.key
+        return bucket.get(source)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -61,9 +67,15 @@ class SoilTempSensor(CoordinatorEntity[SoilTempCoordinator], SensorEntity):
         if snapshot is None:
             return {}
         lat, lon = snapshot.location
-        return {
+        source = self.entity_description.source_field or self.entity_description.key
+        attrs: dict[str, Any] = {
             "observation_date": snapshot.observation_date,
             "fetched_at": snapshot.fetched_at.isoformat(),
-            "api_unit": snapshot.units.get(self.entity_description.key),
             "location": f"{lat},{lon}",
         }
+        if self.entity_description.bucket == BUCKET_LATEST:
+            attrs["api_unit"] = snapshot.units.get(source)
+        else:
+            attrs["source_field"] = source
+            attrs["window"] = self.entity_description.bucket.removeprefix("averages_")
+        return attrs

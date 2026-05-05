@@ -20,11 +20,13 @@ from .api import (
     ClearApiRateLimitError,
 )
 from .const import (
+    API_FIELD_KEYS,
+    AVG_5D_WINDOW,
+    AVG_24H_WINDOW,
     CONF_SCAN_INTERVAL,
     DEFAULT_SCAN_INTERVAL_HOURS,
     DOMAIN,
     LOOKBACK_DAYS,
-    SENSOR_KEYS,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -39,6 +41,8 @@ class SoilSnapshot:
     location: tuple[float, float]
     values: dict[str, float | None] = field(default_factory=dict)
     units: dict[str, str] = field(default_factory=dict)
+    averages_24h: dict[str, float | None] = field(default_factory=dict)
+    averages_5d: dict[str, float | None] = field(default_factory=dict)
     raw: dict[str, Any] = field(default_factory=dict)
 
 
@@ -87,15 +91,25 @@ class SoilTempCoordinator(DataUpdateCoordinator[SoilSnapshot]):
         if not location_block:
             raise UpdateFailed("ClearAPI response did not contain a location block")
 
-        observation_date = _latest_non_empty_date(location_block)
-        if observation_date is None:
+        sorted_dates = sorted(
+            d for d, day in location_block.items() if isinstance(day, dict) and day
+        )
+        if not sorted_dates:
             raise UpdateFailed("ClearAPI response had no daily observations")
 
-        day = location_block[observation_date] or {}
+        observation_date = sorted_dates[-1]
+        last_24h_dates = sorted_dates[-AVG_24H_WINDOW:]
+        last_5d_dates = sorted_dates[-AVG_5D_WINDOW:]
+
         values: dict[str, float | None] = {}
         units: dict[str, str] = {}
-        for key in SENSOR_KEYS:
-            entry_data = day.get(key)
+        averages_24h: dict[str, float | None] = {}
+        averages_5d: dict[str, float | None] = {}
+
+        latest_day = location_block.get(observation_date) or {}
+
+        for key in API_FIELD_KEYS:
+            entry_data = latest_day.get(key) if isinstance(latest_day, dict) else None
             if isinstance(entry_data, dict):
                 values[key] = _coerce_float(entry_data.get("value"))
                 unit = entry_data.get("unit")
@@ -104,19 +118,25 @@ class SoilTempCoordinator(DataUpdateCoordinator[SoilSnapshot]):
             else:
                 values[key] = None
 
+            averages_24h[key] = _mean_for_field(location_block, last_24h_dates, key)
+            averages_5d[key] = _mean_for_field(location_block, last_5d_dates, key)
+
         snapshot = SoilSnapshot(
             observation_date=observation_date,
             fetched_at=datetime.now(timezone.utc),
             location=(lat, lon),
             values=values,
             units=units,
+            averages_24h=averages_24h,
+            averages_5d=averages_5d,
             raw=payload,
         )
         _LOGGER.debug(
-            "Soil snapshot for %s,%s observation_date=%s fields=%d",
+            "Soil snapshot for %s,%s observation_date=%s days=%d fields=%d",
             lat,
             lon,
             observation_date,
+            len(sorted_dates),
             sum(1 for v in values.values() if v is not None),
         )
         return snapshot
@@ -132,16 +152,26 @@ def _extract_location_block(payload: dict[str, Any]) -> dict[str, Any] | None:
     return None
 
 
-def _latest_non_empty_date(location_block: dict[str, Any]) -> str | None:
-    """Pick the most-recent ISO date whose value dict is non-empty."""
-    candidates = [
-        date_key
-        for date_key, day in location_block.items()
-        if isinstance(day, dict) and day
-    ]
-    if not candidates:
+def _mean_for_field(
+    location_block: dict[str, Any],
+    dates: list[str],
+    key: str,
+) -> float | None:
+    """Mean of `key`'s value across the given dates (skipping missing entries)."""
+    samples: list[float] = []
+    for date_key in dates:
+        day = location_block.get(date_key)
+        if not isinstance(day, dict):
+            continue
+        entry_data = day.get(key)
+        if not isinstance(entry_data, dict):
+            continue
+        value = _coerce_float(entry_data.get("value"))
+        if value is not None:
+            samples.append(value)
+    if not samples:
         return None
-    return max(candidates)
+    return sum(samples) / len(samples)
 
 
 def _coerce_float(value: Any) -> float | None:

@@ -23,20 +23,22 @@
   },
   "entity": {
     "sensor": {
-      "soil_temp_0to10cm": { "name": "Soil temperature (0–10cm)" },
-      "soil_temp_max_0to10cm": { "name": "Soil temperature max (0–10cm)" },
-      "soil_temp_min_0to10cm": { "name": "Soil temperature min (0–10cm)" },
-      "normalized_soil_temp_0to10cm": { "name": "Soil temperature anomaly (0–10cm)" },
-      "soil_moisture_0to10cm": { "name": "Soil moisture (0–10cm)" },
-      "scaled_soil_moisture_0to10cm": { "name": "Soil moisture scaled (0–10cm)" },
-      "abs_scaled_soil_moisture_0to10cm": { "name": "Soil moisture abs-scaled (0–10cm)" },
-      "abs_scaled_paw_soil_moisture_0to10cm": { "name": "Plant-available water scaled (0–10cm)" },
-      "normalized_soil_moisture_0to10cm": { "name": "Soil moisture anomaly (0–10cm)" },
-      "soil_moisture_0to200cm": { "name": "Soil moisture (0–200cm)" },
-      "scaled_soil_moisture_0to200cm": { "name": "Soil moisture scaled (0–200cm)" },
-      "abs_scaled_soil_moisture_0to200cm": { "name": "Soil moisture abs-scaled (0–200cm)" },
-      "abs_scaled_paw_soil_moisture_0to200cm": { "name": "Plant-available water scaled (0–200cm)" },
-      "normalized_soil_moisture_0to200cm": { "name": "Soil moisture anomaly (0–200cm)" }
+      "soil_temp_0to10cm": { "name": "(0–10cm)" },
+      "soil_temp_max_0to10cm": { "name": "Max (0–10cm)" },
+      "soil_temp_min_0to10cm": { "name": "Min (0–10cm)" },
+      "soil_temp_avg_24h_0to10cm": { "name": "Avg 24h (0–10cm)" },
+      "soil_temp_avg_5d_0to10cm": { "name": "Avg 5d (0–10cm)" },
+      "normalized_soil_temp_0to10cm": { "name": "Anomaly (0–10cm)" },
+      "soil_moisture_0to10cm": { "name": "Moisture (0–10cm)" },
+      "scaled_soil_moisture_0to10cm": { "name": "Moisture scaled (0–10cm)" },
+      "abs_scaled_soil_moisture_0to10cm": { "name": "Moisture abs-scaled (0–10cm)" },
+      "abs_scaled_paw_soil_moisture_0to10cm": { "name": "PAW scaled (0–10cm)" },
+      "normalized_soil_moisture_0to10cm": { "name": "Moisture anomaly (0–10cm)" },
+      "soil_moisture_0to200cm": { "name": "Moisture (0–200cm)" },
+      "scaled_soil_moisture_0to200cm": { "name": "Moisture scaled (0–200cm)" },
+      "abs_scaled_soil_moisture_0to200cm": { "name": "Moisture abs-scaled (0–200cm)" },
+      "abs_scaled_paw_soil_moisture_0to200cm": { "name": "PAW scaled (0–200cm)" },
+      "normalized_soil_moisture_0to200cm": { "name": "Moisture anomaly (0–200cm)" }
     }
   }
 }

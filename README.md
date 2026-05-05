@@ -14,6 +14,7 @@ Home Assistant custom integration that polls [ClearAPI's `/v1.1/daily/soil`](htt
 Primary metrics:
 
 - Soil temperature avg / max / min (0–10 cm), °F (HA auto-converts to your preferred unit)
+- Soil temperature 24-hour and 5-day rolling averages (0–10 cm)
 - Soil moisture (0–10 cm), inches
 - Soil moisture (0–200 cm), inches
 

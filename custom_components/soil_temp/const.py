@@ -1,6 +1,8 @@
 """Constants and sensor catalog for the Soil Temp (ClearAPI) integration."""
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntityDescription,
@@ -22,12 +24,26 @@ MIN_SCAN_INTERVAL_HOURS = 1
 MAX_SCAN_INTERVAL_HOURS = 24
 
 LOOKBACK_DAYS = 7
+AVG_5D_WINDOW = 5
+AVG_24H_WINDOW = 1
 
 UNIT_INCHES = "in"
 
+BUCKET_LATEST = "values"
+BUCKET_AVG_24H = "averages_24h"
+BUCKET_AVG_5D = "averages_5d"
 
-def _temp(key: str, icon: str) -> SensorEntityDescription:
-    return SensorEntityDescription(
+
+@dataclass(frozen=True, kw_only=True)
+class SoilSensorDescription(SensorEntityDescription):
+    """SensorEntityDescription with hints for which coordinator bucket / API field to read."""
+
+    source_field: str | None = None
+    bucket: str = BUCKET_LATEST
+
+
+def _temp(key: str, icon: str) -> SoilSensorDescription:
+    return SoilSensorDescription(
         key=key,
         translation_key=key,
         device_class=SensorDeviceClass.TEMPERATURE,
@@ -37,8 +53,8 @@ def _temp(key: str, icon: str) -> SensorEntityDescription:
     )
 
 
-def _moisture_inches(key: str, icon: str) -> SensorEntityDescription:
-    return SensorEntityDescription(
+def _moisture_inches(key: str, icon: str) -> SoilSensorDescription:
+    return SoilSensorDescription(
         key=key,
         translation_key=key,
         state_class=SensorStateClass.MEASUREMENT,
@@ -48,8 +64,8 @@ def _moisture_inches(key: str, icon: str) -> SensorEntityDescription:
     )
 
 
-def _diagnostic(key: str, icon: str) -> SensorEntityDescription:
-    return SensorEntityDescription(
+def _diagnostic(key: str, icon: str) -> SoilSensorDescription:
+    return SoilSensorDescription(
         key=key,
         translation_key=key,
         state_class=SensorStateClass.MEASUREMENT,
@@ -59,7 +75,21 @@ def _diagnostic(key: str, icon: str) -> SensorEntityDescription:
     )
 
 
-SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
+def _temp_avg(key: str, source_field: str, bucket: str, icon: str) -> SoilSensorDescription:
+    return SoilSensorDescription(
+        key=key,
+        translation_key=key,
+        source_field=source_field,
+        bucket=bucket,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
+        suggested_display_precision=1,
+        icon=icon,
+    )
+
+
+RAW_SENSOR_DESCRIPTIONS: tuple[SoilSensorDescription, ...] = (
     _temp("soil_temp_0to10cm", "mdi:thermometer"),
     _temp("soil_temp_max_0to10cm", "mdi:thermometer-high"),
     _temp("soil_temp_min_0to10cm", "mdi:thermometer-low"),
@@ -76,4 +106,23 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
     _diagnostic("normalized_soil_moisture_0to200cm", "mdi:sigma"),
 )
 
-SENSOR_KEYS: tuple[str, ...] = tuple(d.key for d in SENSOR_DESCRIPTIONS)
+COMPUTED_SENSOR_DESCRIPTIONS: tuple[SoilSensorDescription, ...] = (
+    _temp_avg(
+        "soil_temp_avg_24h_0to10cm",
+        source_field="soil_temp_0to10cm",
+        bucket=BUCKET_AVG_24H,
+        icon="mdi:thermometer",
+    ),
+    _temp_avg(
+        "soil_temp_avg_5d_0to10cm",
+        source_field="soil_temp_0to10cm",
+        bucket=BUCKET_AVG_5D,
+        icon="mdi:thermometer",
+    ),
+)
+
+SENSOR_DESCRIPTIONS: tuple[SoilSensorDescription, ...] = (
+    RAW_SENSOR_DESCRIPTIONS + COMPUTED_SENSOR_DESCRIPTIONS
+)
+
+API_FIELD_KEYS: tuple[str, ...] = tuple(d.key for d in RAW_SENSOR_DESCRIPTIONS)
