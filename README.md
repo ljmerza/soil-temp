@@ -1,5 +1,15 @@
 # Soil Temp (ClearAPI)
 
+<p align="center">
+<img src="https://img.shields.io/github/stars/ljmerza/soil-temp?style=for-the-badge&label=Stars&color=orange" alt="Stars">
+<a href="https://github.com/ljmerza/soil-temp/releases/latest"><img src="https://img.shields.io/github/v/release/ljmerza/soil-temp?style=for-the-badge&color=purple" alt="Version"></a>
+<a href="https://github.com/ljmerza/soil-temp/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ljmerza/soil-temp?style=for-the-badge&label=License&color=green" alt="License"></a>
+</p>
+
+<p align="center">
+<a href="https://www.buymeacoffee.com/JMISm06AD"><img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee"></a>
+</p>
+
 Home Assistant custom integration that polls [ClearAPI's `/v1.1/daily/soil`](https://ag.us.clearapis.com) endpoint for the home coordinates configured in Home Assistant and exposes the returned soil temperature and moisture metrics as sensors.
 
 ## Install via HACS
@@ -33,9 +43,3 @@ Each entity exposes the source `observation_date`, `fetched_at` timestamp, `api_
 
 - API credentials are the public demo `app_id`/`app_key` from ClearAPI's documentation, hardcoded in `const.py`. Swap them in the source if you have your own.
 - One config entry per home location; HA's configured `latitude`/`longitude` is read fresh on every poll, so moving your HA home location is reflected on the next refresh without a reload.
-
----
-
-Enjoy my work? Help me out for a couple of :beers: or a :coffee:!
-
-<a href="https://www.buymeacoffee.com/JMISm06AD"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="41" width="174"></a>
